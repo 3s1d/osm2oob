@@ -10,8 +10,13 @@
 
 #include <vector>
 
+#include "bazlCsv.hpp"
+#include "coord3d.hpp"
 #include "nodeDb.hpp"
 #include "osmparser.hpp"
+
+#define deg2rad(angleDegrees) ((angleDegrees) * M_PI / 180.0)
+#define rad2deg(angleRadians) ((angleRadians) * 180.0 / M_PI)
 
 class OobWritter
 {
@@ -19,15 +24,18 @@ private:
 	std::string fname;
 	//todo writing started?
 	int written = 0;
+	int dropped = 0;
 
 	//todo type... altitude...
-	std::vector<coord3d> track;
+	std::vector<Coord3D> track;
 
 	NodeDB *db = nullptr;
+	BazlCsv *bazl = nullptr;
 
 public:
 	OobWritter(std::string fname) : fname(fname) { }
 	void setNodeDb(NodeDB *db) { this->db = db; }
+	void addBazl(BazlCsv *bazl);
 	void finish(void);
 
 

@@ -10,27 +10,22 @@
 
 #include <map>
 
+#include "coord3d.hpp"
 #include "osmparser.hpp"
 
-typedef struct
-{
-	float lat;
-	float lon;
-	float alt;
-} coord3d;
 
 class NodeDB
 {
 private:
-	std::map<int64_t, coord3d> db;
+	std::map<int64_t, Coord3D> db;
 
-	coord3d coord;
+	Coord3D coord;
 	int64_t id = 0;
 
 public:
 	NodeDB() { }
 
-	coord3d operator[](const int64_t id) { return db[id]; }
+	Coord3D operator[](const int64_t id) { return db[id]; }
 
 	void startElement(const std::string& name, const XmlAttr& attr);
 	void endElement(const std::string& name);

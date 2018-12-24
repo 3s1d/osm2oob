@@ -8,6 +8,7 @@
 #include <iostream>
 #include <boost/filesystem.hpp>
 
+#include "bazlCsv.hpp"
 #include "nodeDb.hpp"
 #include "oob.hpp"
 #include "osmparser.hpp"
@@ -46,7 +47,25 @@ int main(int argc, char* argv[])
 	vector<string> files;
 	read_directory(argv[1], files);
 
+	BazlCsv bazl = BazlCsv();
 	OobWritter oob = OobWritter("world.oob");
+
+	/* iterate over CSV files */
+	//note: needs to be first in order to aid OSM data
+	for(auto file : files)
+	{
+		string fname = string(argv[1]);
+		fname += "/" + file;
+
+		/* text from flyland */
+		//todo improve check
+		if(file.find(".txt") == std::string::npos)
+			continue;
+
+		cout << "Converting BAZL/flyland data: " << fname << endl;
+		bazl.add(fname);
+	}
+	oob.addBazl(&bazl);
 
 	/* iterate over all files */
 	for(auto file : files)

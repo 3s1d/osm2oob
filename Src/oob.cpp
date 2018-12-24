@@ -27,7 +27,15 @@ void OobWritter::endElement(const std::string& name)
 {
 	if(name == "way")
 	{
-		//todo writting
+		/* check for similar version in BAZL data */
+		if(bazl != nullptr && bazl->isSimilar(track.front(), track.back()))
+		{
+			dropped++;
+			track.clear();
+			return;
+		}
+
+		//todo build obstacle and write
 
 
 		track.clear();
@@ -41,5 +49,18 @@ void OobWritter::finish(void)
 	//todo close all
 
 
-	std::cout << "Written " << written << " shapes" << std::endl;
+	std::cout << "OSM written " << written << " shapes (dropped: " << dropped << ")" << std::endl;
+}
+
+
+void OobWritter::addBazl(BazlCsv *bazl)
+{
+	/* add reference */
+	this->bazl = bazl;
+
+	//todo write
+
+	//todo
+	std::cout << "BAZL written " << bazl->numObst() << " shapes" << std::endl;
+
 }

@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include "oob.hpp"
 #include "nodeDb.hpp"
 
 void NodeDB::startElement(const std::string& name, const XmlAttr& attr)
@@ -14,8 +15,8 @@ void NodeDB::startElement(const std::string& name, const XmlAttr& attr)
 	if(name == "node")
 	{
 		/* prepare node for adding */
-		coord.lat = attr.asDouble("lat");
-		coord.lon = attr.asDouble("lon");
+		coord.lat = deg2rad(attr.asDouble("lat"));
+		coord.lon = deg2rad(attr.asDouble("lon"));
 		coord.alt = -10000.0f;		//not an attributes
 		id = attr.asInt64("id");
 	}
