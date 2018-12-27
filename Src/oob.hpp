@@ -18,21 +18,42 @@
 #define deg2rad(angleDegrees) ((angleDegrees) * M_PI / 180.0)
 #define rad2deg(angleRadians) ((angleRadians) * 180.0 / M_PI)
 
+/*
+ * Format:
+ * 3byte char      'OOB'
+ * 1byte uint8_t   version number, currently 1
+ * 8byte time_t	   built time
+ *
+ * Obstacle:
+ * 4byte float latitude rad
+ * 4byte float longitude rad
+ * --------------------------
+ * 8bytes
+ */
+
+typedef struct
+{
+	float lat_rad;
+	float lon_rad;
+	float altitude;
+} __attribute__((packed)) oob_edge_t;
+
 class OobWritter
 {
 private:
 	std::string fname;
-	//todo writing started?
-	int written = 0;
-	int dropped = 0;
 
+	/* Temp Obstalce */
 	//todo type... altitude...
 	std::vector<Coord3D> track;
-
 	NodeDB *db = nullptr;
-	BazlCsv *bazl = nullptr;
+
+	/* all obstacles */
+	std::vector<Obstacle> obstacles;
 
 public:
+	const char *id = "OOB\x1";
+
 	OobWritter(std::string fname) : fname(fname) { }
 	void setNodeDb(NodeDB *db) { this->db = db; }
 	void addBazl(BazlCsv *bazl);

@@ -7,6 +7,7 @@
 
 #include <iostream>
 
+#include "elevation.h"
 #include "oob.hpp"
 #include "nodeDb.hpp"
 
@@ -31,6 +32,15 @@ void NodeDB::endElement(const std::string& name)
 {
 	/* put node into map */
 	if(name == "node")
+	{
+		/* altitude update required */
+		if(coord.alt < -500.0f && elevation.at(coord) == false)
+		{
+			std::cerr << "Elevation failed @ " << rad2deg(coord.lat) << " " << rad2deg(coord.lon) << std::endl;
+			exit(-1);
+		}
+
 		db[id] = coord;
+	}
 }
 

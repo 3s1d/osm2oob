@@ -18,6 +18,8 @@ private:
 
 public:
 	std::vector<Coord3D> track;
+
+	void write(std::ofstream &file);
 };
 
 

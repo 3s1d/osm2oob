@@ -15,6 +15,11 @@
 
 using namespace std;
 
+//Land Vorarlberg – data.vorarlberg.gv.at
+//Land Tirol - data.tirol.gv.at -> https://gis.tirol.gv.at/ogd/verkehr_technik/FLUGHINDERNISSE_tirol.zip
+//http://gis2.provinz.bz.it/geobrowser/?project=geobrowser_pro&view=Luftfahrthindernisse&lang=de
+
+
 struct path_leaf_string
 {
     std::string operator()(const boost::filesystem::directory_entry& entry) const
@@ -47,11 +52,9 @@ int main(int argc, char* argv[])
 	vector<string> files;
 	read_directory(argv[1], files);
 
-	BazlCsv bazl = BazlCsv();
 	OobWritter oob = OobWritter("world.oob");
 
-	/* iterate over CSV files */
-	//note: needs to be first in order to aid OSM data
+	/* iterate over all files */
 	for(auto file : files)
 	{
 		string fname = string(argv[1]);
@@ -59,31 +62,27 @@ int main(int argc, char* argv[])
 
 		/* text from flyland */
 		//todo improve check
-		if(file.find(".txt") == std::string::npos)
+		if(file.find(".txt") != std::string::npos)
+		{
+			cout << "Converting BAZL/flyland data: " << fname << endl;
+			BazlCsv bazl = BazlCsv();
+			bazl.add(fname);
+			oob.addBazl(&bazl);
 			continue;
+		}
 
-		cout << "Converting BAZL/flyland data: " << fname << endl;
-		bazl.add(fname);
-	}
-	oob.addBazl(&bazl);
-
-	/* iterate over all files */
-	for(auto file : files)
-	{
 		/* is osm file */
 		//todo improve check
 		if(file.find(".osm") == std::string::npos && file.find(".osm.bz") == std::string::npos && file.find(".osm.gz") == std::string::npos)
 			continue;
-		string fname = string(argv[1]);
-		fname += "/" + file;
-		std::cout << "Converting file: " << fname << std::endl;
+		std::cout << "Converting OSM file: " << fname << std::endl;
 
-		cout << "Stage 1: node acquiring" << endl;
+		//cout << "Stage 1: node acquiring" << endl;
 		NodeDB nodes = NodeDB();
 		OsmParser<NodeDB> nodeParser(nodes);
 		nodeParser.parse(fname);
 
-		cout << "Stage 2: build ways" << endl;
+		//cout << "Stage 2: build ways" << endl;
 		oob.setNodeDb(&nodes);
 		OsmParser<OobWritter> wayParser(oob);
 		wayParser.parse(fname);

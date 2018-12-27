@@ -19,11 +19,13 @@ public:
 	float lon;
 	float alt;
 
-	double distance(const Coord3D &to)
-	{
-		return (2.0*asin(sqrt( pow((sin((lat-to.lat)/2.0)),2.0) + cos(lat)*cos(to.lat)*pow((sin((lon-to.lon)/2.0f)),2.0) )) * D_FAK);
-	}
+	Coord3D(): lat(0), lon(0), alt(0) { }
+	Coord3D(float lat, float lon) : lat(lat), lon(lon), alt(0) { }
+
+	double distance(const Coord3D &to);
 };
 
+Coord3D operator-(const Coord3D& lhs, const Coord3D& rhs);
+bool operator!=(const Coord3D& lhs, const Coord3D& rhs);
 
 #endif /* SRC_COORD3D_HPP_ */

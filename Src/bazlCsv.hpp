@@ -8,6 +8,7 @@
 #ifndef SRC_BAZLCSV_HPP_
 #define SRC_BAZLCSV_HPP_
 
+#include <string>
 #include <vector>
 
 #include "obstacle.hpp"
@@ -16,9 +17,10 @@ class BazlCsv
 {
 private:
 	const std::string delimeter = "#,;";
-	std::vector<Obstacle> obstacles;
 
 public:
+	std::vector<Obstacle> obstacles;
+
 	BazlCsv() { }
 	void add(std::string fname);
 
