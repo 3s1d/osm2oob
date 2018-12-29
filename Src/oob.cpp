@@ -77,7 +77,7 @@ void OobWritter::toKml(void)
 	for(auto obs : obstacles)
 	{
 
-		oob_edge_t last;
+		oob_vertex_t last;
 		last.lat_rad = obs.track.front().lat;
 		last.lon_rad = obs.track.front().lon;
 		last.altitude = obs.track.front().alt;

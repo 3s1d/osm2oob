@@ -24,11 +24,18 @@
  * 1byte uint8_t   version number, currently 1
  * 8byte time_t	   built time
  *
- * Obstacle:
- * 4byte float latitude rad
- * 4byte float longitude rad
+ * Obstacle Edge:
+ * 4byte float latitude rad	vertex0
+ * 4byte float longitude rad	vertex0
+ * 4byte MSL altitude		vertex0
+ * 4byte float latitude rad	vertex1
+ * 4byte float longitude rad	vertex1
+ * 4byte MSL altitude		vertex1
  * --------------------------
- * 8bytes
+ * 24bytes
+ *
+ *
+ * note: multiple edges are considered as a polygon if vertex1 of the previous edge is equal to vertex0 of the current edge
  */
 
 typedef struct
@@ -36,7 +43,7 @@ typedef struct
 	float lat_rad;
 	float lon_rad;
 	float altitude;
-} __attribute__((packed)) oob_edge_t;
+} __attribute__((packed)) oob_vertex_t;
 
 class OobWritter
 {

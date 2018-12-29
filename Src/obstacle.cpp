@@ -9,7 +9,7 @@
 
 void Obstacle::write(std::ofstream &file)
 {
-	oob_edge_t last;
+	oob_vertex_t last;
 	last.lat_rad = track.front().lat;
 	last.lon_rad = track.front().lon;
 	last.altitude = track.front().alt;
@@ -17,13 +17,13 @@ void Obstacle::write(std::ofstream &file)
 	for(std::vector<Coord3D>::iterator it = std::next(track.begin()); it != track.end(); ++it)
 	{
 		/* tuple */
-		file.write((char *) &last, sizeof(oob_edge_t));
+		file.write((char *) &last, sizeof(oob_vertex_t));
 
 		/* update */
 		last.lat_rad = it->lat;
 		last.lon_rad = it->lon;
 		last.altitude = it->alt;
-		file.write((char *) &last, sizeof(oob_edge_t));
+		file.write((char *) &last, sizeof(oob_vertex_t));
 	}
 
 }
