@@ -51,6 +51,7 @@ private:
 	/* all obstacles */
 	std::vector<Obstacle> obstacles;
 
+	void toKml(void);
 public:
 	const char *id = "OOB\x1";
 

@@ -2,4 +2,4 @@ Release/*
 Debug/*
 data/*
 cache/*
-world.oob
+world.oob*

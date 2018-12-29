@@ -74,7 +74,7 @@ bool Elevation::readHgt(const Coord3D &posAnchor)
 	}
 
 	/* decompressor/read */
-	file.read(buffer, sizeof(buffer));
+	file.read((char *)buffer, sizeof(buffer));
 	int read = file.gcount();
 	file.close();
 

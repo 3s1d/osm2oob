@@ -35,7 +35,7 @@ private:
 	uint16_t numPointsX;
 	uint16_t numPointsY;
 	Coord3D anchor;
-	char buffer[HGT_DATA_WIDTH_1 * HGT_DATA_WIDTH_1 * 2 + 1];
+	uint8_t buffer[HGT_DATA_WIDTH_1 * HGT_DATA_WIDTH_1 * 2 + 1];
 
 	bool readHgt(const Coord3D &posAnchor);
 

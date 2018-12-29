@@ -13,6 +13,8 @@
 #include "oob.hpp"
 #include "osmparser.hpp"
 
+#include "elevation.h"	//tbr
+
 using namespace std;
 
 //Land Vorarlberg – data.vorarlberg.gv.at
