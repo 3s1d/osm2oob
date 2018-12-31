@@ -3,3 +3,5 @@ Debug/*
 data/*
 cache/*
 world.oob*
+/Debug/
+/Release/

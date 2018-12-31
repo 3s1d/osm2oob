@@ -112,6 +112,14 @@ void OobWritter::toKml(void)
 	kml.close();
 }
 
+void OobWritter::addTester(void)
+{
+	Obstacle obst;
+	obst.track.push_back(Coord3D(deg2rad(49.481), deg2rad(10.785), 370));
+	obst.track.push_back(Coord3D(deg2rad(49.486), deg2rad(10.791), 360));
+	obstacles.push_back(obst);
+}
+
 void OobWritter::addBazl(BazlCsv *bazl)
 {
 	/* adding shapes */

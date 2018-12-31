@@ -8,7 +8,7 @@
 #ifndef SRC_COORD3D_HPP_
 #define SRC_COORD3D_HPP_
 
-#define D_FAK			6371000.0f			// FAI Sphere, mean erath radis in meter
+#define D_FAK			6371000.0f			// FAI Sphere, mean earth radius in meter
 
 #include <math.h>
 
@@ -20,7 +20,7 @@ public:
 	float alt;
 
 	Coord3D(): lat(0), lon(0), alt(0) { }
-	Coord3D(float lat, float lon) : lat(lat), lon(lon), alt(0) { }
+	Coord3D(float lat, float lon, float alt = 0) : lat(lat), lon(lon), alt(alt) { }
 
 	double distance(const Coord3D &to);
 };

@@ -65,6 +65,7 @@ public:
 	OobWritter(std::string fname) : fname(fname) { }
 	void setNodeDb(NodeDB *db) { this->db = db; }
 	void addBazl(BazlCsv *bazl);
+	void addTester(void);
 	void finish(void);
 
 
