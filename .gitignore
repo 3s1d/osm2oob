@@ -5,3 +5,5 @@ cache/*
 world.oob*
 /Debug/
 /Release/
+Build
+*.o
