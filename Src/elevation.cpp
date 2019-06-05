@@ -43,7 +43,6 @@ bool Elevation::readHgt(const Coord3D &posAnchor)
 				std::cin >> user;
 				std::cout << "Password: ";
 				std::cin >> pw;
-
 			}
 
 			/* download */

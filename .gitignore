@@ -7,3 +7,4 @@ world.oob*
 /Release/
 Build
 *.o
+.vscode

@@ -39,10 +39,10 @@ private:
 
 	bool readHgt(const Coord3D &posAnchor);
 
+public:
 	std::string user = "";
 	std::string pw = "";
-
-public:
+	
 	Elevation() : numPointsX(0), numPointsY(0) { }
 	Elevation(const Elevation&) = delete;
 //	~Elevation() { system("rm cache/*.hgt"); }

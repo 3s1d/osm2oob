@@ -13,7 +13,7 @@
 #include "oob.hpp"
 #include "osmparser.hpp"
 
-#include "elevation.h"	//tbr
+#include "elevation.h" //tbr
 
 using namespace std;
 
@@ -21,16 +21,15 @@ using namespace std;
 //Land Tirol - data.tirol.gv.at -> https://gis.tirol.gv.at/ogd/verkehr_technik/FLUGHINDERNISSE_tirol.zip
 //http://gis2.provinz.bz.it/geobrowser/?project=geobrowser_pro&view=Luftfahrthindernisse&lang=de
 
-
 struct path_leaf_string
 {
-    std::string operator()(const boost::filesystem::directory_entry& entry) const
-    {
-        return entry.path().leaf().string();
-    }
+	std::string operator()(const boost::filesystem::directory_entry &entry) const
+	{
+		return entry.path().leaf().string();
+	}
 };
 
-void read_directory(const std::string& name, vector<string>& v)
+void read_directory(const std::string &name, vector<string> &v)
 {
 	boost::filesystem::path p(name);
 	boost::filesystem::directory_iterator start(p);
@@ -38,15 +37,19 @@ void read_directory(const std::string& name, vector<string>& v)
 	std::transform(start, end, std::back_inserter(v), path_leaf_string());
 }
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	cerr << "Open Street Map Ways to Open Obstacle Binary (OOB) converter" << endl; // prints API to AIR converter
 
-	if (argc != 2)
+	if (argc < 2 || argc > 4 || argc == 3)
 	{
-		cerr << "usage: " << argv[0] << " osmFolder " << endl;
+		cerr << "usage: " << argv[0] << " osmFolder [username] [password]" << endl;
 		return 1;
+	}
+
+	if (argc > 2) {
+		elevation.user = argv[2];
+		elevation.pw = argv[3];
 	}
 
 	/* get files */
@@ -57,25 +60,26 @@ int main(int argc, char* argv[])
 	OobWritter oob = OobWritter("world.oob");
 
 	/* iterate over all files */
-	for(auto file : files)
+	for (auto file : files)
 	{
 		string fname = string(argv[1]);
 		fname += "/" + file;
 
 		/* text from flyland */
 		//todo improve check
-		if(file.find(".txt") != std::string::npos)
+		if (file.find(".txt") != std::string::npos)
 		{
 			cout << "Converting BAZL/flyland data: " << fname << endl;
 			BazlCsv bazl = BazlCsv();
 			bazl.add(fname);
 			oob.addBazl(&bazl);
 			continue;
+			
 		}
 
 		/* is osm file */
 		//todo improve check
-		if(file.find(".osm") == std::string::npos && file.find(".osm.bz") == std::string::npos && file.find(".osm.gz") == std::string::npos)
+		if (file.find(".osm") == std::string::npos && file.find(".osm.bz") == std::string::npos && file.find(".osm.gz") == std::string::npos)
 			continue;
 		std::cout << "Converting OSM file: " << fname << std::endl;
 
@@ -88,11 +92,8 @@ int main(int argc, char* argv[])
 		oob.setNodeDb(&nodes);
 		OsmParser<OobWritter> wayParser(oob);
 		wayParser.parse(fname);
-
 	}
 
 	oob.addTester();
 	oob.finish();
 }
-
-
