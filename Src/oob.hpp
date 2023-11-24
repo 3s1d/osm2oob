@@ -23,14 +23,19 @@
  * 3byte char      'OOB'
  * 1byte uint8_t   version number, currently 1
  * 8byte time_t	   built time
+ * 4byte float     top (latitude rad)
+ * 4byte float     bottom (latitude rad)
+ * 4byte float     left (longitude rad)
+ * 4byte float     right (longitude rad)
+ * 2byte uint16_t  #obstacles
  *
- * Obstacle Edge:
- * 4byte float latitude rad	vertex0
+ * Obstacle:
+ * 1byte magic 'O'
+ * 1byte 'Number of Vertex' - 1		(1: 2vertex, 2: 3vertex, ... 1 vertex allowed theoretically, but currently omitted)
+ * 'Number of Vertex'x:
+ * 4byte float latitude rad		vertex0
  * 4byte float longitude rad	vertex0
- * 4byte MSL altitude		vertex0
- * 4byte float latitude rad	vertex1
- * 4byte float longitude rad	vertex1
- * 4byte MSL altitude		vertex1
+ * 2byte MSL altitude			vertex0
  * --------------------------
  * 24bytes
  *
@@ -42,7 +47,7 @@ typedef struct
 {
 	float lat_rad;
 	float lon_rad;
-	float altitude;
+	int16_t altitude;
 } __attribute__((packed)) oob_vertex_t;
 
 class OobWritter
@@ -58,15 +63,17 @@ private:
 	/* all obstacles */
 	std::vector<Obstacle> obstacles;
 
-	void toKml(void);
 public:
-	const char *id = "OOB\x1";
+	const char *id = "OOB\x2";
+	const char *idOld = "OOB\x1";
 
 	OobWritter(std::string fname) : fname(fname) { }
 	void setNodeDb(NodeDB *db) { this->db = db; }
-	void addBazl(BazlCsv *bazl);
+	void add(std::vector<Obstacle> &obst);
 	void addTester(void);
-	void finish(void);
+
+	void toKml(void);
+	void finish(bool vOne = false);
 
 
 	void startElement(const std::string& name, const XmlAttr& attr);

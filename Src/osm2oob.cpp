@@ -12,8 +12,11 @@
 #include "nodeDb.hpp"
 #include "oob.hpp"
 #include "osmparser.hpp"
+#include "xconGjson.hpp"
 
 #include "elevation.h" //tbr
+
+#define DO_BAZLFLYLAND
 
 using namespace std;
 
@@ -39,17 +42,18 @@ void read_directory(const std::string &name, vector<string> &v)
 
 int main(int argc, char *argv[])
 {
-	cerr << "Open Street Map Ways to Open Obstacle Binary (OOB) converter" << endl; // prints API to AIR converter
+	cerr << "Open Street Map Ways / GeoJson to Open Obstacle Binary (OOB) converter (Version 2.0)" << endl; // prints API to AIR converter
 
-	if (argc < 2 || argc > 4 || argc == 3)
+	if (argc < 3 || argc > 5 || argc == 4)
 	{
-		cerr << "usage: " << argv[0] << " osmFolder [username] [password]" << endl;
+		cerr << "usage: " << argv[0] << " osmFolder oobFolder [username] [password]" << endl;
 		return 1;
 	}
 
-	if (argc > 2) {
-		elevation.user = argv[2];
-		elevation.pw = argv[3];
+	if (argc > 3)
+	{
+		elevation.user = argv[3];
+		elevation.pw = argv[4];
 	}
 
 	/* get files */
@@ -57,43 +61,132 @@ int main(int argc, char *argv[])
 	vector<string> files;
 	read_directory(argv[1], files);
 
+	/*
+	 * V2
+	 */
+	/* iterate over all files */
+	for (auto file : files)
+	{
+		/* input file */
+		string fnameIn = string(argv[1]);
+		fnameIn += "/" + file;
+
+		/* output file */
+		string fnameOut = string(argv[2]);
+		fnameOut += "/" + file;
+
+		size_t dotPosition = fnameIn.find_last_of('.');
+
+		if (dotPosition != std::string::npos)
+		{
+			std::string baseName = fnameOut.substr(0, dotPosition);
+			fnameOut = baseName + ".oob";
+		}
+		else
+		{
+			fnameOut += ".oob";
+		}
+
+		OobWritter oob = OobWritter(fnameOut);
+
+		/* convert */
+#ifdef DO_BAZLFLYLAND
+		/* text from flyland */
+		if (file.find(".txt") != std::string::npos)
+		{
+			cout << "Converting BAZL/flyland data: " << fnameIn << endl;
+			BazlCsv bazl = BazlCsv();
+			bazl.add(fnameIn);
+			oob.add(bazl.obstacles);
+		} else
+#endif
+
+		if (file.find(".geojson") != std::string::npos)
+		{
+			/* it's a geojson */
+			cout << "Converting geojson(xcontest) data: " << fnameIn << " to " << fnameOut << endl;
+			XconGjson xgjson = XconGjson();
+			xgjson.load(fnameIn);
+			oob.add(xgjson.obstacles);
+		}
+		else
+		{
+			/* it's a osm file */
+			//todo improve check
+			if (file.find(".osm") == std::string::npos && file.find(".osm.bz") == std::string::npos && file.find(".osm.gz") == std::string::npos)
+				continue;
+			std::cout << "Converting OSM file: " << fnameIn << " to " << fnameOut << std::endl;
+
+			//cout << "Stage 1: node acquiring" << endl;
+			NodeDB nodes = NodeDB();
+			OsmParser<NodeDB> nodeParser(nodes);
+			nodeParser.parse(fnameIn);
+
+			//cout << "Stage 2: build ways" << endl;
+			oob.setNodeDb(&nodes);
+			OsmParser<OobWritter> wayParser(oob);
+			wayParser.parse(fnameIn);
+		}
+
+		oob.finish();
+	}
+
+	/*
+	 * V1 + KML
+	 */
+
+	cout << "Legacy stuff" << endl;
+
 	OobWritter oob = OobWritter("world.oob");
 
 	/* iterate over all files */
 	for (auto file : files)
 	{
-		string fname = string(argv[1]);
-		fname += "/" + file;
+		/* input file */
+		string fnameIn = string(argv[1]);
+		fnameIn += "/" + file;
 
+		/* convert */
+#ifdef DO_BAZLFLYLAND
 		/* text from flyland */
-		//todo improve check
 		if (file.find(".txt") != std::string::npos)
 		{
-			cout << "Converting BAZL/flyland data: " << fname << endl;
+			cout << "Converting BAZL/flyland data: " << fnameIn << endl;
 			BazlCsv bazl = BazlCsv();
-			bazl.add(fname);
-			oob.addBazl(&bazl);
-			continue;
-			
+			bazl.add(fnameIn);
+			oob.add(bazl.obstacles);
+		} else
+#endif
+
+		if (file.find(".geojson") != std::string::npos)
+		{
+			/* it's a geojson */
+			cout << "Converting geojson(xcontest) data: " << fnameIn << endl;
+			XconGjson xgjson = XconGjson();
+			xgjson.load(fnameIn);
+			oob.add(xgjson.obstacles);
 		}
+		else
+		{
+			/* it's a osm file */
+			//todo improve check
+			if (file.find(".osm") == std::string::npos && file.find(".osm.bz") == std::string::npos && file.find(".osm.gz") == std::string::npos)
+				continue;
+			std::cout << "Converting OSM file: " << fnameIn << std::endl;
 
-		/* is osm file */
-		//todo improve check
-		if (file.find(".osm") == std::string::npos && file.find(".osm.bz") == std::string::npos && file.find(".osm.gz") == std::string::npos)
-			continue;
-		std::cout << "Converting OSM file: " << fname << std::endl;
+			//cout << "Stage 1: node acquiring" << endl;
+			NodeDB nodes = NodeDB();
+			OsmParser<NodeDB> nodeParser(nodes);
+			nodeParser.parse(fnameIn);
 
-		//cout << "Stage 1: node acquiring" << endl;
-		NodeDB nodes = NodeDB();
-		OsmParser<NodeDB> nodeParser(nodes);
-		nodeParser.parse(fname);
-
-		//cout << "Stage 2: build ways" << endl;
-		oob.setNodeDb(&nodes);
-		OsmParser<OobWritter> wayParser(oob);
-		wayParser.parse(fname);
+			//cout << "Stage 2: build ways" << endl;
+			oob.setNodeDb(&nodes);
+			OsmParser<OobWritter> wayParser(oob);
+			wayParser.parse(fnameIn);
+		}
 	}
 
-	oob.addTester();
-	oob.finish();
+	/* write files */
+	oob.finish(true);
+	oob.toKml();
 }

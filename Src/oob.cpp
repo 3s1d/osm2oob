@@ -34,28 +34,52 @@ void OobWritter::endElement(const std::string& name)
 }
 
 
-void OobWritter::finish(void)
+void OobWritter::finish(bool vOne)
 {
 	std::ofstream myFile (fname, std::ios::out | std::ios::binary);
 
 	/* header */
-	myFile.write(id, strlen(id));
+	myFile.write(vOne ? idOld : id, strlen(id));
 	time_t t = time(nullptr);
 	myFile.write((char *) &t, sizeof(time_t));
 
+	if(vOne == false)
+	{
+		/* bounding box */
+		float lat_top = -M_PI;
+		float lat_bot = M_PI;
+		float lon_left = M_PI*2.0f;
+		float lon_right = -M_PI*2.0f;
+		for(auto obs : obstacles)
+			for(auto vertex : obs.track)
+			{
+				if(vertex.lat > lat_top)
+					lat_top = vertex.lat;
+				if(vertex.lat < lat_bot)
+					lat_bot = vertex.lat;
+				if(vertex.lon > lon_right)
+					lon_right = vertex.lon;
+				if(vertex.lon < lon_left)
+					lon_left = vertex.lon;
+			}
+		myFile.write((char *) &lat_top, sizeof(float));
+		myFile.write((char *) &lat_bot, sizeof(float));
+		myFile.write((char *) &lon_left, sizeof(float));
+		myFile.write((char *) &lon_right, sizeof(float));
+
+		/* num obstacles */
+		uint16_t numObst = obstacles.size();
+		myFile.write((char *) &numObst, sizeof(uint16_t));
+	}
+
 	/* obstacles */
 	for(auto obs : obstacles)
-		obs.write(myFile);
+		obs.write(myFile, vOne);
 
-
-	std::cout << "OSM written " << obstacles.size() << " shapes" << std::endl;
-
-	/* write control kml */
-	toKml();
+	std::cout << "OSM written " << obstacles.size() << " shapes (" << (vOne ? "v1)" : "v2)") << std::endl;
 
 	/* cleanup */
 	myFile.close();
-	obstacles.clear();
 }
 
 
@@ -120,8 +144,8 @@ void OobWritter::addTester(void)
 	obstacles.push_back(obst);
 }
 
-void OobWritter::addBazl(BazlCsv *bazl)
+void OobWritter::add(std::vector<Obstacle> &obst)
 {
 	/* adding shapes */
-	obstacles.insert(obstacles.end(), bazl->obstacles.begin(), bazl->obstacles.end());
+	obstacles.insert(obstacles.end(), obst.begin(), obst.end());
 }
