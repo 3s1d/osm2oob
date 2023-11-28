@@ -47,8 +47,15 @@ typedef struct
 {
 	float lat_rad;
 	float lon_rad;
+	float altitude;
+} __attribute__((packed)) oob1_vertex_t;
+
+typedef struct
+{
+	float lat_rad;
+	float lon_rad;
 	int16_t altitude;
-} __attribute__((packed)) oob_vertex_t;
+} __attribute__((packed)) oob2_vertex_t;
 
 class OobWritter
 {
