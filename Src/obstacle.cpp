@@ -79,7 +79,7 @@ void Obstacle::write(std::ofstream &file, bool vOne)
 	uint8_t numVertex = track.size() - 1;
 	file.write((char *) &numVertex, sizeof(uint8_t));
 
-	for(std::vector<Coord3D>::iterator it = std::next(track.begin()); it != track.end(); ++it)
+	for(std::vector<Coord3D>::iterator it = track.begin(); it != track.end(); ++it)
 	{
 		oob2_vertex_t vertex;
 		vertex.lat_rad = it->lat;
